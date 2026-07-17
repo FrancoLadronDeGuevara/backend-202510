@@ -1,3 +1,10 @@
 {
-  "users": []
+  "users": [
+    {
+      "id": "d7b5e00e-bfdc-428b-8653-e6d2b32ee94e",
+      "email": "francoguevara@gmail.com",
+      "password": "$2a$10$xDDtx6yhc552EywMt.eczuYaZqgoJUcfT9NNVT.k8ZlUhQM3bbrk6",
+      "createAt": "2026-07-17T00:48:33.085Z"
+    }
+  ]
 }
