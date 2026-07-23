@@ -53,4 +53,58 @@ const login = async ({ email, password }) => {
   return { token };
 };
 
-module.exports = { register };
+const getAll = () => {
+  const db = readDB("users.json");
+  return db.users.map(({ password, ...user }) => user);
+};
+
+const getById = (id) => {
+  const db = readDB("users.json");
+
+  const user = db.users.find((user) => user.id === id);
+
+  if (!user) {
+    const error = new Error("Usuario no encontrado");
+    error.status = 404;
+    throw error;
+  }
+
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+};
+
+const update = (id, fields) => {
+  const db = readDB("users.json");
+
+  const index = db.users.findIndex((user) => user.id === id);
+
+  if (index === -1) {
+    const error = new Error("No se encontró el usuario");
+    error.status = 404;
+    throw error;
+  }
+
+  db.users[index] = { ...db.users[index], ...fields, id };
+
+  writeDB("users.json", db);
+
+  const { password, ...userWithoutPassword } = db.users[index];
+  return userWithoutPassword;
+};
+
+const remove = (id) => {
+  const db = readDB("users.json");
+
+  const index = db.users.findIndex((user) => user.id === id);
+
+  if (index === -1) {
+    const error = new Error("No se encontró el usuario");
+    error.status = 404;
+    throw error;
+  }
+
+  db.users.splice(index, 1);
+  writeDB("users.json", db);
+};
+
+module.exports = { register, login, getAll, getById, update, remove };

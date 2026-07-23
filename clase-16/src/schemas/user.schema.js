@@ -7,4 +7,20 @@ const registerSchema = z.object({
     .min(6, { message: "La constraseña debe ser de al menos 6 cáracteres" }),
 });
 
-module.exports = { registerSchema };
+const loginSchema = z.object({
+  email: z.string().email({ message: "Dirección de email inválida" }),
+  password: z.string().min(1, { message: "El campo password es obligatorio" }),
+});
+
+const updateUserSchema = z.object({
+  email: z
+    .string()
+    .email({ message: "Dirección de email inválida" })
+    .optional(),
+  password: z
+    .string()
+    .min(6, { message: "La constraseña debe ser de al menos 6 cáracteres" })
+    .optional(),
+});
+
+module.exports = { registerSchema, loginSchema, updateUserSchema };

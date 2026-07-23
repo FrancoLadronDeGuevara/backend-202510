@@ -5,6 +5,30 @@
       "email": "francoguevara@gmail.com",
       "password": "$2a$10$xDDtx6yhc552EywMt.eczuYaZqgoJUcfT9NNVT.k8ZlUhQM3bbrk6",
       "createAt": "2026-07-17T00:48:33.085Z"
+    },
+    {
+      "id": "f12d863c-81db-4eef-b10d-d04f8bf47e03",
+      "email": "debora.antara@gmail.com",
+      "password": "$2a$10$TpPMcPaNZOX8qUzFtw8HsOC4dCMX9o17AvvhrMwFzx0Dh89DSQGT.",
+      "createAt": "2026-07-20T23:12:15.816Z"
+    },
+    {
+      "id": "8459b19d-b18d-4711-b6e9-ddeba1bb2f8e",
+      "email": "waithsheila@gmail.com",
+      "password": "$2a$10$4ZxdhOKmp8jAZLT.tRxEj.PKRaYaApS20tHLYslmhJs4yBruufKjy",
+      "createAt": "2026-07-20T23:12:47.939Z"
+    },
+    {
+      "id": "9485d67c-71a8-4b1f-b1df-b9e38360a0d0",
+      "email": "lilen2000@gmail.com",
+      "password": "$2a$10$ChiYZ2eQR1rhhoqvIlZ/Te4ejgIKm5q2lux9tdem8wtjGxoD8I87a",
+      "createAt": "2026-07-20T23:12:58.702Z"
+    },
+    {
+      "id": "89104da4-ddf0-4261-9b7a-859b49a7a9a1",
+      "email": "pepita.perez@gmail.com",
+      "password": "$2a$10$fV7i.oXGd0ARbkx2WpdJM.3kv8WjlZmiY6buDPTmkKC1bmepxOKbK",
+      "createAt": "2026-07-20T23:13:14.935Z"
     }
   ]
 }

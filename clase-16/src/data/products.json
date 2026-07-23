@@ -1,3 +1,28 @@
 {
-  "products": []
+  "products": [
+    {
+      "id": "f9488a5f-59c8-43e7-8e89-adafee871d34",
+      "name": "Teclado Mecánico Logitech G235",
+      "description": "Teclado Negro Marca Logitech sin baterias, larga duración",
+      "price": 50000,
+      "stock": 645,
+      "createAt": "2026-07-22T23:50:49.550Z"
+    },
+    {
+      "id": "0bcf5c6e-d344-458e-9395-934eec051ed1",
+      "name": "Coolkiller CK98",
+      "description": "Teclado Mecánico Transparente sin baterias, larga duración, RGB, pantalla amoled 8 pulgadas",
+      "price": 450000,
+      "stock": 751,
+      "createAt": "2026-07-22T23:52:31.180Z"
+    },
+    {
+      "id": "abe9220d-c2b6-4332-86b5-65c0bc8d62fd",
+      "name": "Monitor QLED Samsung 20 pulgadas",
+      "description": "Monitor 120Hz HDR 3DSBS, Curved",
+      "price": 500000,
+      "stock": 30,
+      "createAt": "2026-07-22T23:53:58.248Z"
+    }
+  ]
 }
