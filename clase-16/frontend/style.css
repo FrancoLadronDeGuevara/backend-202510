@@ -1,0 +1,39 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  box-shadow: 0 6px 10px #00000080;
+}
+
+.botones button {
+  padding: 8px 12px;
+  text-transform: uppercase;
+  font-weight: bolder;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  transition: all ease 0.2s;
+  cursor: pointer;
+}
+
+#registrarse:hover,
+#iniciar-sesion:hover {
+  box-shadow: 0 6px 6px #00000080;
+  transform: translateY(-5px);
+}
+
+#registrarse {
+  background-color: #00c950;
+}
+
+#iniciar-sesion {
+  margin-left: 1rem;
+  background-color: #2b7fff;
+}
