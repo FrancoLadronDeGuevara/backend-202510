@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://frontend-agenda-contactos.vercel.app/",
+    origin: "https://frontend-agenda-contactos.vercel.app",
   })
 );
 
