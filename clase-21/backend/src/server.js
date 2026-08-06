@@ -8,7 +8,11 @@ const contactsRouter = require("./routes/contacts.routes");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://frontend-agenda-contactos.vercel.app/",
+  })
+);
 
 app.use(express.json());
 
