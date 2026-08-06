@@ -1,4 +1,4 @@
-const urlBase = "http://localhost:4000";
+const urlBase = "https://backend-agenda-contactos.onrender.com";
 
 const $listaContactos = document.getElementById("contact-list");
 const $formulario = document.getElementById("add-form");
