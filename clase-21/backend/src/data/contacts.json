@@ -1,3 +1,52 @@
 {
-  "contacts": []
+  "contacts": [
+    {
+      "id": "db1f5a30-952a-459a-81a7-67de0a3b7e03",
+      "name": "Franco Guevara",
+      "email": "franco@gmail.com",
+      "phone": "+5438915367724",
+      "createAt": "2026-08-05T22:34:29.406Z",
+      "updateAt": "2026-08-05T22:34:29.406Z"
+    },
+    {
+      "id": "56077c3c-1c4e-4232-8d2b-dc1b8249513c",
+      "name": "Agustina Prats",
+      "email": "agustina@gmail.com",
+      "phone": "+543815823648",
+      "createAt": "2026-08-05T22:35:04.218Z",
+      "updateAt": "2026-08-05T22:35:04.218Z"
+    },
+    {
+      "id": "e7e5cdbb-9b91-494c-a800-23109f65be14",
+      "name": "Lilen Chu",
+      "email": "lilen@gmail.com",
+      "phone": "+543862562314",
+      "createAt": "2026-08-05T22:35:27.548Z",
+      "updateAt": "2026-08-05T22:35:27.549Z"
+    },
+    {
+      "id": "5b41d01f-38b5-4d2c-8b3c-acc9d7c88046",
+      "name": "Sheila Wrath",
+      "email": "sheila@gmail.com",
+      "phone": "+543872145896",
+      "createAt": "2026-08-05T22:35:50.387Z",
+      "updateAt": "2026-08-05T22:35:50.387Z"
+    },
+    {
+      "id": "11c150fa-3cdd-42bf-94a9-48cf63eac8ab",
+      "name": "Veronica Lopez",
+      "email": "veronica@gmail.com",
+      "phone": "+543815478596",
+      "createAt": "2026-08-05T22:36:09.089Z",
+      "updateAt": "2026-08-05T22:36:09.089Z"
+    },
+    {
+      "id": "cfc201af-30d9-4fa0-86de-aa6ead96225a",
+      "name": "Franco Ladron de Guevara",
+      "email": "francoguevara93@gmail.com",
+      "phone": "+543815367724",
+      "createAt": "2026-08-05T23:55:10.989Z",
+      "updateAt": "2026-08-05T23:55:10.989Z"
+    }
+  ]
 }

@@ -1,3 +1,10 @@
 {
-  "users": []
+  "users": [
+    {
+      "id": "68c1823e-3bd8-4244-9eed-2862ce30a71e",
+      "email": "usuario@usuario.com",
+      "password": "$2b$10$Lo7mXQgU6p.8TIeKTntff.vGFXwC/vIVF1.lGOVDqy.GpjzDqQqHi",
+      "createAt": "2026-08-05T22:31:54.491Z"
+    }
+  ]
 }

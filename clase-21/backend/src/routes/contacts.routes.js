@@ -14,12 +14,7 @@ const router = Router();
 
 router.get("/", contactsController.getAll);
 
-router.post(
-  "/",
-  authenticate,
-  validate(contactSchema),
-  contactsController.create
-);
+router.post("/", validate(contactSchema), contactsController.create);
 
 router.put(
   "/:id",
@@ -28,6 +23,6 @@ router.put(
   contactsController.update
 );
 
-router.delete("/:id", authenticate, contactsController.remove);
+router.delete("/:id", contactsController.remove);
 
 module.exports = router;
