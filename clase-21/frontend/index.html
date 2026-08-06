@@ -1,121 +1,117 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Agenda de contactos — gestiona tus contactos de forma sencilla y elegante.">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Agenda de contactos — gestiona tus contactos de forma sencilla y elegante."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <title>Agenda de Contactos</title>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- Floating ambient blobs -->
     <div class="blob blob-1" aria-hidden="true"></div>
     <div class="blob blob-2" aria-hidden="true"></div>
     <div class="blob blob-3" aria-hidden="true"></div>
 
     <header id="app-header">
-        <div class="header-inner">
-            <div class="logo">
-                <span class="logo-icon">📇</span>
-                <h1>Agenda de Contactos</h1>
-            </div>
-            <p class="header-subtitle">Organiza tu red. Mantente conectado.</p>
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">📇</span>
+          <h1>Agenda de Contactos</h1>
         </div>
+        <p class="header-subtitle">Organiza tu red. Mantente conectado.</p>
+      </div>
     </header>
 
     <main id="app-main">
-        <!-- LEFT PANEL — Form -->
-        <section class="panel panel-form" id="form-panel">
-            <div class="panel-header">
-                <span class="panel-icon">✏️</span>
-                <h2>Nuevo Contacto</h2>
+      <!-- LEFT PANEL — Form -->
+      <section class="panel panel-form" id="form-panel">
+        <div class="panel-header">
+          <span class="panel-icon">✏️</span>
+          <h2>Nuevo Contacto</h2>
+        </div>
+        <form id="add-form" autocomplete="off">
+          <div class="input-group">
+            <label for="name">Nombre</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Ej: María López"
+                required
+              />
             </div>
-            <form id="add-form" autocomplete="off">
-                <div class="input-group">
-                    <label for="name">Nombre</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">👤</span>
-                        <input type="text" id="name" name="name" placeholder="Ej: María López" required>
-                    </div>
-                </div>
+          </div>
 
-                <div class="input-group">
-                    <label for="phone">Teléfono</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">📱</span>
-                        <input type="text" id="phone" name="phone" placeholder="Ej: +54 11 1234-5678" required>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <div class="input-wrapper">
-                        <span class="input-icon">✉️</span>
-                        <input type="email" id="email" name="email" placeholder="Ej: maria@correo.com">
-                    </div>
-                </div>
-
-                <button type="submit" id="btn-submit">
-                    <span class="btn-text">Agregar Contacto</span>
-                    <span class="btn-icon">➕</span>
-                </button>
-            </form>
-        </section>
-
-        <!-- RIGHT PANEL — Contact List -->
-        <section class="panel panel-list" id="list-panel">
-            <div class="panel-header">
-                <span class="panel-icon">📋</span>
-                <h2>Mis Contactos</h2>
-                <span class="badge" id="contact-count">1</span>
+          <div class="input-group">
+            <label for="phone">Teléfono</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📱</span>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                placeholder="Ej: +54 11 1234-5678"
+                required
+              />
             </div>
+          </div>
 
-            <ul id="contact-list">
-                <!-- Example contact card -->
-                <li class="contact-card" id="contact-example">
-                    <div class="contact-avatar">
-                        <span>JD</span>
-                    </div>
-                    <div class="contact-info">
-                        <h3 class="contact-name">Juan Domínguez</h3>
-                        <p class="contact-detail">
-                            <span class="detail-icon">📱</span>
-                            +54 11 9876-5432
-                        </p>
-                        <p class="contact-detail">
-                            <span class="detail-icon">✉️</span>
-                            juan.dominguez@email.com
-                        </p>
-                    </div>
-                    <div class="contact-actions">
-                        <button class="btn-action btn-update" id="btn-update-example" title="Actualizar contacto">
-                            <span>🔄</span>
-                            <span class="action-label">Editar</span>
-                        </button>
-                        <button class="btn-action btn-delete" id="btn-delete-example" title="Eliminar contacto">
-                            <span>🗑️</span>
-                            <span class="action-label">Eliminar</span>
-                        </button>
-                    </div>
-                </li>
-            </ul>
-
-            <div class="empty-state" id="empty-state" style="display: none;">
-                <span class="empty-icon">📭</span>
-                <p>No hay contactos aún.</p>
-                <p class="empty-hint">Agrega uno desde el formulario.</p>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Ej: maria@correo.com"
+              />
             </div>
-        </section>
+          </div>
+
+          <button type="submit" id="btn-submit">
+            <span class="btn-text">Agregar Contacto</span>
+            <span class="btn-icon">➕</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- RIGHT PANEL — Contact List -->
+      <section class="panel panel-list" id="list-panel">
+        <div class="panel-header">
+          <span class="panel-icon">📋</span>
+          <h2>Mis Contactos</h2>
+          <span class="badge" id="contact-count">1</span>
+        </div>
+
+        <ul id="contact-list">
+          <div class="loading-spinner">Cargando contactos...</div>
+        </ul>
+
+        <div class="empty-state" id="empty-state" style="display: none">
+          <span class="empty-icon">📭</span>
+          <p>No hay contactos aún.</p>
+          <p class="empty-hint">Agrega uno desde el formulario.</p>
+        </div>
+      </section>
     </main>
 
     <footer id="app-footer">
-        <p>Hecho con 💜 — ADA 2025</p>
+      <p>Hecho con 💜 — ADA 2025</p>
     </footer>
 
     <script src="index.js"></script>
-</body>
+  </body>
 </html>
