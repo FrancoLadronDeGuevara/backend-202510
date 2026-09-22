@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movies DB - Películas</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎬 Movies DB</h1>
+      <div class="nav-right">
+        <span id="userName"></span>
+        <button id="logoutBtn" class="btn btn-secondary">Cerrar sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Buscar películas...">
+      <select id="genreSelect">
+        <option value="">Todos los géneros</option>
+      </select>
+    </div>
+
+    <div id="moviesGrid" class="movies-grid">
+      <!-- Las películas se cargarán aquí -->
+    </div>
+
+    <!-- Modal para ver detalles de película -->
+    <div id="movieModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="movie-detail">
+          <img id="modalImage" src="" alt="">
+          <div class="movie-info">
+            <h2 id="modalTitle"></h2>
+            <p><strong>Director:</strong> <span id="modalDirector"></span></p>
+            <p><strong>Año:</strong> <span id="modalYear"></span></p>
+            <p><strong>Género:</strong> <span id="modalGenre"></span></p>
+            <p><strong>Rating:</strong> <span id="modalRating"></span></p>
+            <p id="modalDescription"></p>
+
+            <!-- Sección de valoración -->
+            <div class="review-section">
+              <h3>Tu valoración</h3>
+              <div class="rating-input">
+                <select id="modalRatingSelect">
+                  <option value="">Selecciona calificación</option>
+                  <option value="1">⭐ 1 - Muy malo</option>
+                  <option value="2">⭐⭐ 2 - Malo</option>
+                  <option value="3">⭐⭐⭐ 3 - Regular</option>
+                  <option value="4">⭐⭐⭐⭐ 4 - Bueno</option>
+                  <option value="5">⭐⭐⭐⭐⭐ 5 - Excelente</option>
+                </select>
+              </div>
+              <textarea id="modalComment" placeholder="Comenta tu opinión (opcional)"></textarea>
+              <button id="submitReviewBtn" class="btn btn-primary">Enviar valoración</button>
+            </div>
+
+            <!-- Comentarios de otros usuarios -->
+            <div class="reviews-list">
+              <h3>Valoraciones de usuarios</h3>
+              <div id="reviewsList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api';
+    let currentMovieId = null;
+    let movies = [];
+
+    // Verificar autenticación
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+
+      if (!token || !user) {
+        window.location.href = '/';
+        return;
+      }
+
+      const userData = JSON.parse(user);
+      document.getElementById('userName').textContent = `Hola, ${userData.name}`;
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    });
+
+    // Cargar películas
+    async function loadMovies(filters = {}) {
+      const params = new URLSearchParams(filters);
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await fetch(`${API_URL}/movies?${params}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        movies = data.movies;
+        renderMovies();
+      } catch (error) {
+        console.error('Error cargando películas:', error);
+      }
+    }
+
+    // Renderizar películas
+    function renderMovies() {
+      const grid = document.getElementById('moviesGrid');
+      grid.innerHTML = movies.map(movie => `
+        <div class="movie-card" onclick="openMovieModal(${movie.id})">
+          <img src="${movie.image_url || 'https://via.placeholder.com/300x400?text=Sin+Imagen'}" alt="${movie.title}">
+          <h3>${movie.title}</h3>
+          <p class="director">${movie.director || 'Director desconocido'}</p>
+          <p class="rating">⭐ ${parseFloat(movie.average_rating || 0).toFixed(1)} (${movie.review_count || 0} votos)</p>
+        </div>
+      `).join('');
+    }
+
+    // Cargar géneros
+    async function loadGenres() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`${API_URL}/movies/genres`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        const select = document.getElementById('genreSelect');
+        data.genres.forEach(genre => {
+          const option = document.createElement('option');
+          option.value = genre;
+          option.textContent = genre;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error cargando géneros:', error);
+      }
+    }
+
+    // Abrir modal de película
+    async function openMovieModal(movieId) {
+      const token = localStorage.getItem('token');
+      currentMovieId = movieId;
+
+      try {
+        const response = await fetch(`${API_URL}/movies/${movieId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const movie = await response.json();
+
+        document.getElementById('modalTitle').textContent = movie.title;
+        document.getElementById('modalImage').src = movie.image_url || 'https://via.placeholder.com/300x400?text=Sin+Imagen';
+        document.getElementById('modalDirector').textContent = movie.director || 'Desconocido';
+        document.getElementById('modalYear').textContent = movie.release_year || 'Desconocido';
+        document.getElementById('modalGenre').textContent = movie.genre || 'Desconocido';
+        document.getElementById('modalRating').textContent = `${parseFloat(movie.average_rating || 0).toFixed(1)}/5`;
+        document.getElementById('modalDescription').textContent = movie.description || 'Sin descripción';
+
+        // Cargar reviews
+        const reviewsResponse = await fetch(`${API_URL}/reviews/movie/${movieId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const reviewsData = await reviewsResponse.json();
+        renderReviews(reviewsData.reviews);
+
+        document.getElementById('movieModal').style.display = 'block';
+      } catch (error) {
+        console.error('Error cargando película:', error);
+      }
+    }
+
+    // Renderizar reviews
+    function renderReviews(reviews) {
+      const reviewsList = document.getElementById('reviewsList');
+      if (reviews.length === 0) {
+        reviewsList.innerHTML = '<p>Sin valoraciones aún</p>';
+        return;
+      }
+
+      reviewsList.innerHTML = reviews.map(review => `
+        <div class="review-item">
+          <strong>${review.user_name}</strong>
+          <p>${'⭐'.repeat(review.rating)}</p>
+          <p>${review.comment || 'Sin comentario'}</p>
+        </div>
+      `).join('');
+    }
+
+    // Enviar review
+    document.getElementById('submitReviewBtn').addEventListener('click', async () => {
+      const rating = document.getElementById('modalRatingSelect').value;
+      const comment = document.getElementById('modalComment').value;
+      const token = localStorage.getItem('token');
+
+      if (!rating) {
+        alert('Selecciona una calificación');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            movie_id: currentMovieId,
+            rating: parseInt(rating),
+            comment: comment || null
+          })
+        });
+
+        if (response.ok) {
+          alert('¡Valoración enviada!');
+          document.getElementById('modalRatingSelect').value = '';
+          document.getElementById('modalComment').value = '';
+          openMovieModal(currentMovieId); // Recargar
+        }
+      } catch (error) {
+        console.error('Error enviando review:', error);
+      }
+    });
+
+    // Modal close
+    document.querySelector('.close').addEventListener('click', () => {
+      document.getElementById('movieModal').style.display = 'none';
+    });
+
+    // Filtros
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const filters = {};
+      if (e.target.value) filters.search = e.target.value;
+      loadMovies(filters);
+    });
+
+    document.getElementById('genreSelect').addEventListener('change', (e) => {
+      const filters = {};
+      if (e.target.value) filters.genre = e.target.value;
+      loadMovies(filters);
+    });
+
+    // Inicializar
+    checkAuth();
+    loadMovies();
+    loadGenres();
+  </script>
+</body>
+</html>

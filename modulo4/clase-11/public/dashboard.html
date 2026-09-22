@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movies DB - Dashboard Admin</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎬 Movies DB - Admin</h1>
+      <div class="nav-right">
+        <span id="userName"></span>
+        <button onclick="window.location.href='/movies.html'" class="btn btn-secondary">Ver películas</button>
+        <button id="logoutBtn" class="btn btn-secondary">Cerrar sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container dashboard-container">
+    <div class="dashboard-sidebar">
+      <button class="sidebar-btn active" data-tab="list">📽️ Mis películas</button>
+      <button class="sidebar-btn" data-tab="create">➕ Agregar película</button>
+    </div>
+
+    <div class="dashboard-content">
+      <!-- TAB: LISTA DE PELÍCULAS -->
+      <div id="list" class="tab-content active">
+        <h2>Mis películas</h2>
+        <div id="myMoviesList" class="movies-table">
+          <!-- Las películas se cargarán aquí -->
+        </div>
+      </div>
+
+      <!-- TAB: CREAR PELÍCULA -->
+      <div id="create" class="tab-content">
+        <h2>Agregar nueva película</h2>
+        <form id="createMovieForm" class="form-box">
+          <div class="form-group">
+            <label for="title">Título *</label>
+            <input type="text" id="title" name="title" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="director">Director</label>
+              <input type="text" id="director" name="director">
+            </div>
+            <div class="form-group">
+              <label for="release_year">Año de lanzamiento</label>
+              <input type="number" id="release_year" name="release_year">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="genre">Género</label>
+              <input type="text" id="genre" name="genre" placeholder="ej: Drama, Sci-Fi">
+            </div>
+            <div class="form-group">
+              <label for="image_url">URL de imagen</label>
+              <input type="url" id="image_url" name="image_url">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" rows="5"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Crear película</button>
+          <div id="createError" class="error-message"></div>
+          <div id="createSuccess" class="success-message"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para editar película -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Editar película</h2>
+      <form id="editMovieForm" class="form-box">
+        <input type="hidden" id="editMovieId">
+
+        <div class="form-group">
+          <label for="editTitle">Título</label>
+          <input type="text" id="editTitle">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editDirector">Director</label>
+            <input type="text" id="editDirector">
+          </div>
+          <div class="form-group">
+            <label for="editYear">Año</label>
+            <input type="number" id="editYear">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editGenre">Género</label>
+            <input type="text" id="editGenre">
+          </div>
+          <div class="form-group">
+            <label for="editImage">URL de imagen</label>
+            <input type="url" id="editImage">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editDescription">Descripción</label>
+          <textarea id="editDescription" rows="5"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <div id="editError" class="error-message"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/api';
+    let currentEditId = null;
+
+    // Verificar autenticación y permisos
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+
+      if (!token || !user) {
+        window.location.href = '/';
+        return;
+      }
+
+      const userData = JSON.parse(user);
+      if (userData.role !== 'admin') {
+        alert('No tienes permisos de administrador');
+        window.location.href = '/movies.html';
+        return;
+      }
+
+      document.getElementById('userName').textContent = `Hola, ${userData.name}`;
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    });
+
+    // Tab switching
+    document.querySelectorAll('.sidebar-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = e.target.dataset.tab;
+        
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        
+        e.target.classList.add('active');
+        document.getElementById(tab).classList.add('active');
+      });
+    });
+
+    // Cargar mis películas
+    async function loadMyMovies() {
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await fetch(`${API_URL}/movies`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        // Filtrar solo las películas del usuario actual
+        const myMovies = data.movies.filter(m => m.created_by === user.id);
+
+        if (myMovies.length === 0) {
+          document.getElementById('myMoviesList').innerHTML = '<p>Aún no has creado películas</p>';
+          return;
+        }
+
+        document.getElementById('myMoviesList').innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Director</th>
+                <th>Género</th>
+                <th>Año</th>
+                <th>Rating</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${myMovies.map(movie => `
+                <tr>
+                  <td>${movie.title}</td>
+                  <td>${movie.director || '-'}</td>
+                  <td>${movie.genre || '-'}</td>
+                  <td>${movie.release_year || '-'}</td>
+                  <td>${parseFloat(movie.average_rating || 0).toFixed(1)}</td>
+                  <td>
+                    <button class="btn-small btn-edit" onclick="openEditModal(${movie.id}, '${movie.title}', '${movie.director || ''}', ${movie.release_year || 'null'}, '${movie.genre || ''}', '${movie.image_url || ''}', '${movie.description || ''}')">Editar</button>
+                    <button class="btn-small btn-delete" onclick="deleteMovie(${movie.id})">Eliminar</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        console.error('Error cargando películas:', error);
+      }
+    }
+
+    // Crear película
+    document.getElementById('createMovieForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const errorDiv = document.getElementById('createError');
+      const successDiv = document.getElementById('createSuccess');
+
+      errorDiv.textContent = '';
+      successDiv.textContent = '';
+
+      const formData = {
+        title: document.getElementById('title').value,
+        director: document.getElementById('director').value || undefined,
+        release_year: document.getElementById('release_year').value ? parseInt(document.getElementById('release_year').value) : undefined,
+        genre: document.getElementById('genre').value || undefined,
+        image_url: document.getElementById('image_url').value || undefined,
+        description: document.getElementById('description').value || undefined,
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/movies`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al crear película');
+        }
+
+        successDiv.textContent = '¡Película creada exitosamente!';
+        document.getElementById('createMovieForm').reset();
+        loadMyMovies();
+      } catch (error) {
+        errorDiv.textContent = error.message;
+      }
+    });
+
+    // Abrir modal de edición
+    function openEditModal(id, title, director, year, genre, image, description) {
+      currentEditId = id;
+      document.getElementById('editMovieId').value = id;
+      document.getElementById('editTitle').value = title;
+      document.getElementById('editDirector').value = director;
+      document.getElementById('editYear').value = year || '';
+      document.getElementById('editGenre').value = genre;
+      document.getElementById('editImage').value = image;
+      document.getElementById('editDescription').value = description;
+      document.getElementById('editModal').style.display = 'block';
+    }
+
+    // Editar película
+    document.getElementById('editMovieForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const errorDiv = document.getElementById('editError');
+
+      errorDiv.textContent = '';
+
+      const formData = {
+        title: document.getElementById('editTitle').value || undefined,
+        director: document.getElementById('editDirector').value || undefined,
+        release_year: document.getElementById('editYear').value ? parseInt(document.getElementById('editYear').value) : undefined,
+        genre: document.getElementById('editGenre').value || undefined,
+        image_url: document.getElementById('editImage').value || undefined,
+        description: document.getElementById('editDescription').value || undefined,
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/movies/${currentEditId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          alert('¡Película actualizada!');
+          document.getElementById('editModal').style.display = 'none';
+          loadMyMovies();
+        } else {
+          const data = await response.json();
+          throw new Error(data.error);
+        }
+      } catch (error) {
+        errorDiv.textContent = error.message;
+      }
+    });
+
+    // Eliminar película
+    async function deleteMovie(id) {
+      if (!confirm('¿Estás seguro de que quieres eliminar esta película?')) return;
+
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await fetch(`${API_URL}/movies/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          alert('¡Película eliminada!');
+          loadMyMovies();
+        }
+      } catch (error) {
+        console.error('Error eliminando película:', error);
+      }
+    }
+
+    // Modal close
+    document.querySelector('.close').addEventListener('click', () => {
+      document.getElementById('editModal').style.display = 'none';
+    });
+
+    // Inicializar
+    checkAuth();
+    loadMyMovies();
+  </script>
+</body>
+</html>
