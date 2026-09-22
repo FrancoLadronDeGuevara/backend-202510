@@ -284,5 +284,3 @@ R: 1) Modifica el schema en SQL, 2) Actualiza la validación en Zod, 3) Actualiz
 R: Sí, pero tendrías que cambiar la librería (mongodb, postgres, etc.)
 
 ---
-
-¡Éxito con tu clase! 🚀
