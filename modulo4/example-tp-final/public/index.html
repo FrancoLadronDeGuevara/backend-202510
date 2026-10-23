@@ -3,12 +3,413 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./css/styles.css" />
-    <title>SHOP API</title>
+    <meta
+      name="description"
+      content="ShopAPI - Plataforma de E-commerce moderna con Node.js, Express y MongoDB. Gestiona productos, órdenes y usuarios."
+    />
+    <title>ShopAPI | E-commerce REST API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
-    <h1>EJEMPLO SHOP API</h1>
-    <div id="notificacion"></div>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <a href="/" class="nav-logo">
+          <span class="logo-icon">🛒</span>
+          <span class="logo-text">ShopAPI</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+          <a href="#products" class="nav-link">Productos</a>
+          <a href="#categories" class="nav-link">Categorías</a>
+          <a
+            href="#orders"
+            class="nav-link"
+            id="ordersNavLink"
+            style="display: none"
+            >Mis Órdenes</a
+          >
+        </div>
+        <div class="nav-actions">
+          <div id="authButtons">
+            <button class="btn btn-ghost" id="loginBtn">Iniciar Sesión</button>
+            <button class="btn btn-primary" id="registerBtn">
+              Registrarse
+            </button>
+          </div>
+          <div id="userMenu" style="display: none" class="user-menu">
+            <div class="user-avatar" id="userAvatar"></div>
+            <span class="user-name" id="userName"></span>
+            <button class="btn btn-ghost btn-sm" id="logoutBtn">Salir</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-badge">✨ API RESTful Profesional</div>
+        <h1 class="hero-title">
+          Tu tienda online,<br />
+          <span class="gradient-text">potenciada por ShopAPI</span>
+        </h1>
+        <p class="hero-subtitle">
+          Una API robusta con autenticación JWT, gestión de inventario en tiempo
+          real, y sistema completo de órdenes. Lista para producción.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" id="heroCTABtn">
+            Explorar Productos
+          </button>
+          <a href="/api" class="btn btn-glass btn-lg" target="_blank"
+            >Ver API Docs</a
+          >
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number" id="statProducts">0</span>
+            <span class="stat-label">Productos</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number" id="statCategories">0</span>
+            <span class="stat-label">Categorías</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-number" id="statEndpoints">20+</span>
+            <span class="stat-label">Endpoints</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="api-card glass">
+          <div class="api-card-header">
+            <span class="method-badge get">GET</span>
+            <span class="endpoint">/api/products</span>
+          </div>
+          <div class="api-response">
+            <pre><code>{
+  "success": true,
+  "data": {
+    "products": [...],
+    "pagination": {
+      "total": 48,
+      "page": 1
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ── MODALS ─────────────────────────────────────────── -->
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+      <div class="modal glass">
+        <button class="modal-close" onclick="closeModal('loginModal')">
+          ✕
+        </button>
+        <div class="modal-icon">🔐</div>
+        <h2 class="modal-title">Iniciar Sesión</h2>
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input
+              type="email"
+              id="loginEmail"
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Contraseña</label>
+            <input
+              type="password"
+              id="loginPassword"
+              placeholder="Tu contraseña"
+              required
+            />
+          </div>
+          <div id="loginError" class="form-error"></div>
+          <button
+            type="submit"
+            class="btn btn-primary btn-full"
+            id="loginSubmitBtn"
+          >
+            <span class="btn-text">Iniciar Sesión</span>
+            <span class="btn-loader" style="display: none">⟳</span>
+          </button>
+        </form>
+        <p class="modal-footer-text">
+          ¿No tienes cuenta?
+          <button
+            class="link-btn"
+            onclick="switchModal('loginModal','registerModal')"
+          >
+            Regístrate
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal-overlay" id="registerModal">
+      <div class="modal glass">
+        <button class="modal-close" onclick="closeModal('registerModal')">
+          ✕
+        </button>
+        <div class="modal-icon">✨</div>
+        <h2 class="modal-title">Crear Cuenta</h2>
+        <form id="registerForm" class="auth-form">
+          <div class="form-group">
+            <label for="registerName">Nombre completo</label>
+            <input
+              type="text"
+              id="registerName"
+              placeholder="Tu nombre"
+              required
+              minlength="2"
+            />
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input
+              type="email"
+              id="registerEmail"
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Contraseña</label>
+            <input
+              type="password"
+              id="registerPassword"
+              placeholder="Mínimo 6 caracteres"
+              required
+              minlength="6"
+            />
+          </div>
+          <div id="registerError" class="form-error"></div>
+          <button
+            type="submit"
+            class="btn btn-primary btn-full"
+            id="registerSubmitBtn"
+          >
+            <span class="btn-text">Crear Cuenta</span>
+            <span class="btn-loader" style="display: none">⟳</span>
+          </button>
+        </form>
+        <p class="modal-footer-text">
+          ¿Ya tienes cuenta?
+          <button
+            class="link-btn"
+            onclick="switchModal('registerModal','loginModal')"
+          >
+            Inicia sesión
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div class="modal-overlay" id="orderModal">
+      <div class="modal glass modal-lg">
+        <button class="modal-close" onclick="closeModal('orderModal')">
+          ✕
+        </button>
+        <div class="modal-icon">📦</div>
+        <h2 class="modal-title">Crear Orden</h2>
+        <form id="orderForm">
+          <div id="orderCart" class="order-cart"></div>
+          <div class="form-divider">Dirección de Envío</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="orderStreet">Calle</label>
+              <input
+                type="text"
+                id="orderStreet"
+                placeholder="Av. Corrientes 1234"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="orderCity">Ciudad</label>
+              <input
+                type="text"
+                id="orderCity"
+                placeholder="Buenos Aires"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="orderZip">Código Postal</label>
+              <input type="text" id="orderZip" placeholder="1000" required />
+            </div>
+            <div class="form-group">
+              <label for="orderPayment">Método de Pago</label>
+              <select id="orderPayment">
+                <option value="cash">Efectivo</option>
+                <option value="credit_card">Tarjeta de Crédito</option>
+                <option value="debit_card">Tarjeta de Débito</option>
+                <option value="transfer">Transferencia</option>
+              </select>
+            </div>
+          </div>
+          <div class="order-total" id="orderTotal"></div>
+          <div id="orderError" class="form-error"></div>
+          <button type="submit" class="btn btn-primary btn-full">
+            Confirmar Orden
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── MAIN CONTENT ───────────────────────────────────── -->
+    <main>
+      <!-- Categories Section -->
+      <section class="section" id="categories">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Categorías</h2>
+            <p class="section-subtitle">Encuentra lo que buscas</p>
+          </div>
+          <div class="categories-grid" id="categoriesGrid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section class="section" id="products">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Productos</h2>
+            <div class="section-controls">
+              <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Buscar productos..."
+                />
+              </div>
+              <select id="filterCategory" class="select-filter">
+                <option value="">Todas las categorías</option>
+              </select>
+              <select id="sortProducts" class="select-filter">
+                <option value="-createdAt">Más recientes</option>
+                <option value="price">Menor precio</option>
+                <option value="-price">Mayor precio</option>
+              </select>
+            </div>
+          </div>
+          <div class="products-grid" id="productsGrid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+          <div class="pagination" id="pagination"></div>
+        </div>
+      </section>
+
+      <!-- My Orders Section -->
+      <section class="section" id="orders" style="display: none">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Mis Órdenes</h2>
+            <p class="section-subtitle">Historial de tus compras</p>
+          </div>
+          <div id="ordersGrid" class="orders-list"></div>
+        </div>
+      </section>
+
+      <!-- Cart Floating Button -->
+      <div class="cart-fab" id="cartFab" style="display: none">
+        <button class="cart-btn" id="cartBtn">
+          🛒
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <span class="logo-icon">🛒</span>
+            <span class="logo-text">ShopAPI</span>
+          </div>
+          <p class="footer-desc">
+            API RESTful de E-commerce — Node.js + Express + MongoDB
+          </p>
+          <div class="footer-tech">
+            <span class="tech-badge">Node.js</span>
+            <span class="tech-badge">Express</span>
+            <span class="tech-badge">MongoDB</span>
+            <span class="tech-badge">JWT</span>
+            <span class="tech-badge">bcrypt</span>
+          </div>
+        </div>
+        <div class="footer-endpoints">
+          <h4>Endpoints Disponibles</h4>
+          <div class="endpoint-list">
+            <span class="ep-item"
+              ><span class="method-badge get">GET</span>/api/products</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge post">POST</span
+              >/api/auth/register</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge post">POST</span>/api/auth/login</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge post">POST</span>/api/orders</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge get">GET</span>/api/categories</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge put">PUT</span>/api/products/:id</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge delete">DEL</span>/api/orders/:id</span
+            >
+            <span class="ep-item"
+              ><span class="method-badge get">GET</span
+              >/api/orders/my-orders</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 ShopAPI · Desarrollado con ❤️ para ADA ITW</p>
+      </div>
+    </footer>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
   </body>
-  <script type="module" src="./js/api.js"></script>
 </html>

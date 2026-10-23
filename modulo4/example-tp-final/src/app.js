@@ -3,8 +3,13 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import path from "path";
 import { fileURLToPath } from "url";
+import errorHandler from "./middlewares/errorHandler.js";
 
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,10 +46,10 @@ app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
 
 app.use("/api/auth", authRoutes);
-/*app.use("/api/users");
-app.use("/api/categories");
-app.use("/api/products");
-app.use("/api/orders");*/
+app.use("/api/users", userRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/api", (req, res) => {
   res.json({
@@ -68,5 +73,7 @@ app.get("/{*path}", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "public", "index.html"));
   }
 });
+
+app.use(errorHandler);
 
 export default app;
